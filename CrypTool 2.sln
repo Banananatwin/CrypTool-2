@@ -468,6 +468,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anonymity", "CrypPlugins\An
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoBoxCipher", "CrypPlugins\CryptoBoxCipher\CryptoBoxCipher.csproj", "{D8D12C51-34B1-40B0-A180-E8EB258219D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonNMGrammFinder", "CrypPlugins\CommonNMGrammFinder\CommonNMGrammFinder.csproj", "{755857F1-B1CF-4ECA-A223-67D08F4B8DFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1394,6 +1396,10 @@ Global
 		{D8D12C51-34B1-40B0-A180-E8EB258219D0}.Debug|x64.Build.0 = Debug|x64
 		{D8D12C51-34B1-40B0-A180-E8EB258219D0}.Release|x64.ActiveCfg = Release|x64
 		{D8D12C51-34B1-40B0-A180-E8EB258219D0}.Release|x64.Build.0 = Release|x64
+		{755857F1-B1CF-4ECA-A223-67D08F4B8DFC}.Debug|x64.ActiveCfg = Debug|x64
+		{755857F1-B1CF-4ECA-A223-67D08F4B8DFC}.Debug|x64.Build.0 = Debug|x64
+		{755857F1-B1CF-4ECA-A223-67D08F4B8DFC}.Release|x64.ActiveCfg = Release|x64
+		{755857F1-B1CF-4ECA-A223-67D08F4B8DFC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1619,6 +1625,7 @@ Global
 		{5B2E0F9E-F7B8-44FC-84D3-CBC00BC21F47} = {1E472920-3A9C-413A-98B2-8372F0E283C5}
 		{3F6EA8C4-DC29-49F0-B783-29DB4608E69E} = {88B851F6-9E3D-484F-A317-ECED5B98C618}
 		{D8D12C51-34B1-40B0-A180-E8EB258219D0} = {88B851F6-9E3D-484F-A317-ECED5B98C618}
+		{755857F1-B1CF-4ECA-A223-67D08F4B8DFC} = {88B851F6-9E3D-484F-A317-ECED5B98C618}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92042D62-2CDA-4393-9D74-4FB5AC571A2D}
