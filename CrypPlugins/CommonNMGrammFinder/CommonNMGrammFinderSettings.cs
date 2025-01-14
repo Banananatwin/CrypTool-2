@@ -25,7 +25,8 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
     {
         #region Private Variables
 
-        private int someParameter = 0;
+        private bool _skipNGram = false;
+        private string _charactersToSkip = "";
 
         #endregion
 
@@ -35,29 +36,47 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         /// HOWTO: This is an example for a setting entity shown in the settings pane on the right of the CT2 main window.
         /// This example setting uses a number field input, but there are many more input types available, see ControlType enumeration.
         /// </summary>
-        [TaskPane("SomeParameter", "This is a parameter tooltip", null, 1, false, ControlType.NumericUpDown, ValidationType.RangeInteger, 0, Int32.MaxValue)]
-        public int SomeParameter
+        [TaskPane("Skip N-Gram Length?", "Do you want to move through the text by jumping the N-Gram length or by moving one letter over?", null, 1, false, ControlType.CheckBox, ValidationType.RangeInteger, 0, 1)]
+        public bool SkipNGram
         {
             get
             {
-                return someParameter;
+                return _skipNGram;
             }
             set
             {
-                if (someParameter != value)
+                if (_skipNGram != value)
                 {
-                    someParameter = value;
+                    _skipNGram = value;
                     // HOWTO: MUST be called every time a property value changes with correct parameter name
-                    OnPropertyChanged("SomeParameter");
+                    OnPropertyChanged("SkipNGram");
                 }
             }
         }
 
-        #endregion
+		[TaskPane("Character to Skip?", "Specify the characters you want to skip during the analysis of N-Grams", null, 1, false, ControlType.TextBox)]
+		public string CharactersToSkip
+		{
+			get
+			{
+				return _charactersToSkip;
+			}
+			set
+			{
+				if (_charactersToSkip != value)
+				{
+					_charactersToSkip = value;
+					// HOWTO: MUST be called every time a property value changes with correct parameter name
+					OnPropertyChanged("CharactersToSkip");
+				}
+			}
+		}
 
-        #region Events
+		#endregion
 
-        public event PropertyChangedEventHandler PropertyChanged;
+		#region Events
+
+		public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
         {

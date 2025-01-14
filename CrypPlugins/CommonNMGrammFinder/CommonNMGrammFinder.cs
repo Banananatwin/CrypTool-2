@@ -14,19 +14,25 @@
    limitations under the License.
 */
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using CrypTool.PluginBase;
 using CrypTool.PluginBase.Miscellaneous;
+using System.Text;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace CrypTool.Plugins.CommonNMGrammFinder
 {
-    // HOWTO: Plugin developer HowTo can be found here: https://github.com/CrypToolProject/CrypTool-2/wiki/Developer-HowTo
-
-    // HOWTO: Change author name, email address, organization and URL.
-    [Author("Anonymous", "coredevs@cryptool.org", "CrypTool 2 Team", "https://www.cryptool.org")]
-    // HOWTO: Change plugin caption (title to appear in CT2) and tooltip.
-    // You can (and should) provide a user documentation as XML file and an own icon.
-    [PluginInfo("Example Plugin", "Subtract one number from another", "CommonNMGrammFinder/userdoc.xml", new[] { "CrypWin/images/default.png" })]
+    [Author("Thomas Brimmers", "thomas.brimmers@stud.hn.de", "Hochschule Niederrhein Master Project", "hsnr.de")]
+    [PluginInfo(
+        "NM-Gram Finder",
+        "Finds common N-M-Grams in text",
+        "CommonNMGrammFinder/userdoc.xml",
+        new[] { "CrypWin/images/default.png" })]
     // HOWTO: Change category to one that fits to your plugin. Multiple categories are allowed.
     [ComponentCategory(ComponentCategory.ToolsMisc)]
     public class CommonNMGrammFinder : ICrypComponent
@@ -35,6 +41,7 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
 
         // HOWTO: You need to adapt the settings class as well, see the corresponding file.
         private readonly CommonNMGrammFinderSettings _settings = new CommonNMGrammFinderSettings();
+        private string inputTextData;
 
         #endregion
 
@@ -44,19 +51,34 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         /// HOWTO: Input interface to read the input data. 
         /// You can add more input properties of other type if needed.
         /// </summary>
-        [PropertyInfo(Direction.InputData, "Input name", "Input tooltip description")]
-        public int SomeInput
+        [PropertyInfo(Direction.InputData, "Text Input", "Text Input", true)]
+        public string InputString
+        {
+            get => inputTextData;
+            set
+            {
+                if (value != inputTextData)
+                {
+                    inputTextData = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [PropertyInfo(Direction.OutputData, "Highlighted Text", "Shows N-gram highlighted in the provided text")]
+        public string HighlightedTextOutput
         {
             get;
             set;
         }
 
         /// <summary>
-        /// HOWTO: Output interface to write the output data.
-        /// You can add more output properties ot other type if needed.
+        /// 
         /// </summary>
-        [PropertyInfo(Direction.OutputData, "Output name", "Output tooltip description")]
-        public int SomeOutput
+        [PropertyInfo(Direction.OutputData, "N-Gram Table", "Show table for frequency of N-M-Gram pairs")]
+        public string TableOutput
         {
             get;
             set;
@@ -90,24 +112,90 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         }
 
         /// <summary>
+        /// Generates a dictionary of N-Gram and M-Gram pairs with their frequencies.
+        /// </summary>
+        /// <param name="inputString">The input string to analyze.</param>
+        /// <param name="nGramLength">The length of the N-Gram.</param>
+        /// <param name="mGramLength">The length of the M-Gram.</param>
+        /// <param name="skipNGram">If true, moves through the text by jumping the N-Gram length; otherwise, moves one letter at a time.</param>
+        /// <returns>A dictionary where the key is the N-Gram and M-Gram combination, and the value is the frequency of that combination.</returns>
+        public (Dictionary<string, int> PairDictionary, Dictionary<string, int> nGramDictionary, Dictionary<string, int> mGramDictionary) GenerateNGramPairDictionary(string inputString, int nGramLength, int mGramLength, bool skipNGram)
+        {
+            Dictionary<string, int> PairDictionary = new Dictionary<string, int>();
+            Dictionary<string, int> nGramDictionary = new Dictionary<string, int>();
+            Dictionary<string, int> mGramDictionary = new Dictionary<string, int>();
+
+            int step = skipNGram ? nGramLength : 1;
+            for (int i = 0; i < inputString.Length - nGramLength - mGramLength + 1; i += step)
+            {
+                string nGram = inputString.Substring(i, nGramLength);
+                string mGram = inputString.Substring(i + nGramLength, mGramLength);
+                string nGramPair = nGram + " " + mGram;
+
+                if (PairDictionary.ContainsKey(nGramPair))
+                {
+                    PairDictionary[nGramPair]++;
+                }
+                else
+                {
+                    PairDictionary.Add(nGramPair, 1);
+                }
+
+                if (nGramDictionary.ContainsKey(nGram))
+                {
+                    nGramDictionary[nGram]++;
+                }
+                else
+                {
+                    nGramDictionary.Add(nGram, 1);
+                }
+
+                if (mGramDictionary.ContainsKey(mGram))
+                {
+                    mGramDictionary[mGram]++;
+                }
+                else
+                {
+                    mGramDictionary.Add(mGram, 1);
+                }
+            }
+            return (PairDictionary, nGramDictionary, mGramDictionary);
+        }
+
+        // Generate a function that takes the output of GenerateNGramPairDictionary and returns a string with the content of the dictionary
+        public string GenerateNGramTable(Dictionary<string, int> nGramPairDictionary)
+        {
+            StringBuilder table = new StringBuilder();
+            table.Append("N-Gram\tM-Gram\tFrequency\n");
+            foreach (KeyValuePair<string, int> entry in nGramPairDictionary.OrderByDescending(e => e.Value))
+            {
+                string[] nGramPair = entry.Key.Split(' ');
+                table.Append(nGramPair[0] + "\t" + nGramPair[1] + "\t" + entry.Value + "\n");
+            }
+            return table.ToString();
+        }
+
+        
+
+        /// <summary>
         /// Called every time this plugin is run in the workflow execution.
         /// </summary>
         public void Execute()
         {
             // HOWTO: Use this to show the progress of a plugin algorithm execution in the editor.
-            ProgressChanged(0, 1);
+            ProgressChanged(0, 2);
 
             // HOWTO: After you have changed an output property, make sure you announce the name of the changed property to the CT2 core.
-            SomeOutput = SomeInput - _settings.SomeParameter;
-            OnPropertyChanged("SomeOutput");
+            HighlightedTextOutput = InputString;
+            OnPropertyChanged("HighlightedTextOutput");
+            ProgressChanged(1, 2);
 
-            // HOWTO: You can pass error, warning, info or debug messages to the CT2 main window.
-            if (_settings.SomeParameter < 0)
-            {
-                GuiLogMessage("SomeParameter is negative", NotificationLevel.Debug);
-            }
+            var (pair_dict, ngram_dict, mgram_dict) = GenerateNGramPairDictionary(InputString, 4, 3, _settings.SkipNGram);
+            TableOutput = GenerateNGramTable(pair_dict);
+            OnPropertyChanged("TableOutput");
+
             // HOWTO: Make sure the progress bar is at maximum when your Execute() finished successfully.
-            ProgressChanged(1, 1);
+            ProgressChanged(2, 2);
         }
 
         /// <summary>
