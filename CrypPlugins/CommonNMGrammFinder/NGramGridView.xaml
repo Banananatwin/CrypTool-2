@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="CrypTool.Plugins.CommonNMGrammFinder.NGramGridView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:commonNmGrammFinder="clr-namespace:CrypTool.Plugins.CommonNMGrammFinder"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <commonNmGrammFinder:FrequencyToColorConverter x:Key="FrequencyToColorConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <TabControl>
+            <TabItem Header="Grid View">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Grid x:Name="NGramFrequencyGrid" ShowGridLines="False" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="In-Text Highlighting">
+                <!-- Add your second presentation content here -->
+                <TextBlock Text="This is the second view." HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

@@ -52,6 +52,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -78,6 +79,10 @@
   <ItemGroup>
     <Compile Include="CommonNMGrammFinder.cs" />
     <Compile Include="CommonNMGrammFinderSettings.cs" />
+    <Compile Include="FrequencyToColorConverter.cs" />
+    <Compile Include="NGramGridView.xaml.cs">
+      <DependentUpon>NGramGridView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +111,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="userdoc.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="NGramGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
