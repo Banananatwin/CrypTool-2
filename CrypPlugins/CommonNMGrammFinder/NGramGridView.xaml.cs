@@ -20,9 +20,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             DataContext = this;
         }
 
-        /// <summary>
-        /// Gets or sets the lower boundary for the frequency to color conversion.
-        /// </summary>
         public int LowerBoundary
         {
             get => _lowerBoundary;
@@ -37,9 +34,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
-        /// <summary>
-        /// Gets or sets the upper boundary for the frequency to color conversion.
-        /// </summary>
         public int UpperBoundary
         {
             get => _upperBoundary;
@@ -54,9 +48,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
-        /// <summary>
-        /// Updates the boundaries for the frequency to color converter.
-        /// </summary>
         private void UpdateConverterBoundaries()
         {
             var converter = (FrequencyToColorConverter)Resources["FrequencyToColorConverter"];
@@ -64,12 +55,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             converter.UpperBoundary = UpperBoundary;
         }
 
-        /// <summary>
-        /// Sets the data for the N-Gram frequency grid and updates the RichTextBox with the N-M-Gram combinations in the text.
-        /// </summary>
-        /// <param name="nGramPairDictionary">The dictionary containing N-Gram pairs and their frequencies.</param>
-        /// <param name="entriesToShow">The number of entries to show in the grid.</param>
-        /// <param name="inputText">The input text to display in the RichTextBox.</param>
         public void SetData(Dictionary<string, int> nGramPairDictionary, int entriesToShow, string inputText)
         {
             _nGramPairDictionary = nGramPairDictionary;
@@ -153,15 +138,26 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center
                     };
+
+                    // Calculate the background color
+                    var backgroundBrush = (frequency >= LowerBoundary && frequency <= UpperBoundary)
+                        ? (Brush)new FrequencyToColorConverter
+                        {
+                            LowerBoundary = LowerBoundary,
+                            UpperBoundary = UpperBoundary
+                        }.Convert(frequency, typeof(Brush), null, null)
+                        : Brushes.Transparent;
+
+                    // Calculate the brightness of the background color
+                    var backgroundColor = ((SolidColorBrush)backgroundBrush).Color;
+                    double brightness = (0.299 * backgroundColor.R + 0.587 * backgroundColor.G + 0.114 * backgroundColor.B) / 255;
+
+                    // Set the font color based on the brightness
+                    textBlock.Foreground = brightness < 0.5 ? Brushes.White : Brushes.Black;
+
                     var border = new Border
                     {
-                        Background = (frequency >= LowerBoundary && frequency <= UpperBoundary)
-                            ? (Brush)new FrequencyToColorConverter
-                            {
-                                LowerBoundary = LowerBoundary,
-                                UpperBoundary = UpperBoundary
-                            }.Convert(frequency, typeof(Brush), null, null)
-                            : Brushes.Transparent,
+                        Background = backgroundBrush,
                         BorderBrush = Brushes.Black,
                         BorderThickness = new Thickness(0.5),
                         Child = textBlock
@@ -213,10 +209,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /// <summary>
-        /// Raises the PropertyChanged event.
-        /// </summary>
-        /// <param name="propertyName">The name of the property that changed.</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
