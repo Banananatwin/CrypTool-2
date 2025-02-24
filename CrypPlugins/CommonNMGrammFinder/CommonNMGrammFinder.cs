@@ -117,7 +117,12 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         {
         }
 
-        // Write a function that sanaizes the input string by removing all characters that are not in _settings.CharactersToSkip. Also remove line breaks.
+        /// <summary>
+        /// Sanitizes the input string by removing all characters that are in _settings.CharactersToSkip.
+        /// Also replaces characters in _settings.CharactersToReplace with _settings.ReplacementCharacter and removes line breaks.
+        /// </summary>
+        /// <param name="inputString">The input string to sanitize.</param>
+        /// <returns>The sanitized string.</returns>
         public string SanitizeInputString(string inputString)
         {
             StringBuilder sanitizedString = new StringBuilder();
@@ -153,7 +158,7 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         /// <param name="nGramLength">The length of the N-Gram.</param>
         /// <param name="mGramLength">The length of the M-Gram.</param>
         /// <param name="skipNGram">If true, moves through the text by jumping the N-Gram length; otherwise, moves one letter at a time.</param>
-        /// <returns>A dictionary where the key is the N-Gram and M-Gram combination, and the value is the frequency of that combination.</returns>
+        /// <returns>A tuple containing three dictionaries: PairDictionary, nGramDictionary, and mGramDictionary.</returns>
         public (Dictionary<string, int> PairDictionary, Dictionary<string, int> nGramDictionary, Dictionary<string, int> mGramDictionary) GenerateNGramPairDictionary(string inputString, int nGramLength, int mGramLength, bool skipNGram)
         {
             Dictionary<string, int> PairDictionary = new Dictionary<string, int>();
@@ -161,14 +166,15 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             Dictionary<string, int> mGramDictionary = new Dictionary<string, int>();
 
             int step = skipNGram ? nGramLength : 1;
-            for (int i = 0; i < inputString.Length - nGramLength - mGramLength + 1; i += step)
+            int i = 0;
+            while (i < inputString.Length - nGramLength - mGramLength + 1)
             {
-                string nGram = GetNGram(inputString, i, nGramLength);
-                string mGram = GetNGram(inputString, i + nGramLength, mGramLength);
+                string nGram = GetNGram(inputString, i, nGramLength, out int nGramEndIndex);
+                string mGram = GetNGram(inputString, i + nGramLength, mGramLength, out int mGramEndIndex);
 
-                // Skip if either nGram or mGram is too short
-                if ( _settings.IgnoreShort && ((nGram.Length < nGramLength) || (mGram.Length < mGramLength)))
+                if (_settings.IgnoreShort && ((nGram.Length < nGramLength) || (mGram.Length < mGramLength)))
                 {
+                    i = Math.Max(nGramEndIndex, mGramEndIndex) + 1;
                     continue;
                 }
 
@@ -200,24 +206,43 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 {
                     mGramDictionary.Add(mGram, 1);
                 }
+
+                i += step;
             }
             return (PairDictionary, nGramDictionary, mGramDictionary);
         }
-        private string GetNGram(string inputString, int startIndex, int length)
+
+        /// <summary>
+        /// Extracts an N-Gram from the input string starting at the specified index and up to the specified length.
+        /// Terminates early if a character in _settings.CharactersToSplit is encountered.
+        /// </summary>
+        /// <param name="inputString">The input string to extract the N-Gram from.</param>
+        /// <param name="startIndex">The starting index for the N-Gram.</param>
+        /// <param name="length">The maximum length of the N-Gram.</param>
+        /// <param name="endIndex">The end index of the N-Gram.</param>
+        /// <returns>The extracted N-Gram.</returns>
+        private string GetNGram(string inputString, int startIndex, int length, out int endIndex)
         {
             StringBuilder nGram = new StringBuilder();
+            endIndex = startIndex;
             for (int i = startIndex; i < startIndex + length && i < inputString.Length; i++)
             {
                 if (_settings.CharactersToSplit.Contains(inputString[i]))
                 {
+                    endIndex = i;
                     break;
                 }
                 nGram.Append(inputString[i]);
+                endIndex = i;
             }
             return nGram.ToString();
         }
 
-        // Generate a function that takes the output of GenerateNGramPairDictionary and returns a string with the content of the dictionary
+        /// <summary>
+        /// Generates a string representation of the N-Gram pair dictionary.
+        /// </summary>
+        /// <param name="nGramPairDictionary">The dictionary containing N-Gram pairs and their frequencies.</param>
+        /// <returns>A string representation of the N-Gram pair dictionary.</returns>
         public string GenerateNGramTable(Dictionary<string, int> nGramPairDictionary)
         {
             StringBuilder table = new StringBuilder();
@@ -236,7 +261,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         /// </summary>
         public void Execute()
         {
-            // Use the Dispatcher to update the UI on the UI thread
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ProgressChanged(0, 3);
@@ -247,11 +271,11 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 OnPropertyChanged("HighlightedTextOutput");
                 ProgressChanged(2, 3);
 
-                
+
                 var (pair_dict, ngram_dict, mgram_dict) = GenerateNGramPairDictionary(sanitizedInputString, _settings.NGramLength, _settings.MGramLength, _settings.SkipNGram);
                 _nGramGridView.LowerBoundary = _settings.LowerBoundary;
                 _nGramGridView.UpperBoundary = _settings.UpperBoundary;
-                _nGramGridView.SetData(pair_dict, _settings.EntriesToShow + 1);
+                _nGramGridView.SetData(pair_dict, _settings.EntriesToShow + 1, InputString);
                 TableOutput = GenerateNGramTable(pair_dict);
                 OnPropertyChanged("TableOutput");
 

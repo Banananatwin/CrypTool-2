@@ -27,7 +27,7 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
 
         private bool _skipNGram = false;
         private bool _ignoreShort = true;
-        private string _charactersToSkip = ""; 
+        private string _charactersToSkip = "";
         private string _charactersToReplace = "!?:;,.()[]{}";
         private string _charactersToSplit = "";
         private string _replacementCharacter = "";
@@ -43,8 +43,8 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         #region TaskPane Settings
 
         /// <summary>
-        /// HOWTO: This is an example for a setting entity shown in the settings pane on the right of the CT2 main window.
-        /// This example setting uses a number field input, but there are many more input types available, see ControlType enumeration.
+        /// Gets or sets a value indicating whether to skip N-Gram length.
+        /// If true, moves through the text by jumping the N-Gram length; otherwise, moves one letter at a time.
         /// </summary>
         [TaskPane("Skip N-Gram Length?", "Do you want to move through the text by jumping the N-Gram length or by moving one letter over?", "Analysis Settings", 1, false, ControlType.CheckBox, ValidationType.RangeInteger, 0, 1)]
         public bool SkipNGram
@@ -58,12 +58,14 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 if (_skipNGram != value)
                 {
                     _skipNGram = value;
-                    // HOWTO: MUST be called every time a property value changes with correct parameter name
                     OnPropertyChanged("SkipNGram");
                 }
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to differentiate between case.
+        /// </summary>
         [TaskPane("Case Sensitive?", "Do you want to differentiate between case?", "Analysis Settings", 2, false, ControlType.CheckBox, ValidationType.RangeInteger, 0, 1)]
         public bool CaseSensitive
         {
@@ -76,12 +78,15 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 if (_caseSensitive != value)
                 {
                     _caseSensitive = value;
-                    // HOWTO: MUST be called every time a property value changes with correct parameter name
                     OnPropertyChanged("CaseSensitive");
                 }
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to ignore short N-Grams.
+        /// When you use the 'Character to Split on' option, it is possible that N-Grams would be created that are shorter than the specified N- or M-Gram length. If this option is activated, those N-Grams will be discarded.
+        /// </summary>
         [TaskPane("Ignore short N-Grams?", "When you use the 'Character to Split on' option, it is possible that N-Grams would be created that are too shorter than you specified N- or M-Gram length. If this option is activated, those N-Grams will be discarded", "Analysis Settings", 3, false, ControlType.CheckBox, ValidationType.RangeInteger, 0, 1)]
         public bool IgnoreShort
         {
@@ -94,12 +99,14 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 if (_ignoreShort != value)
                 {
                     _ignoreShort = value;
-                    // HOWTO: MUST be called every time a property value changes with correct parameter name
                     OnPropertyChanged("IgnoreShort");
                 }
             }
         }
 
+        /// <summary>
+        /// Gets or sets the length of N-Grams.
+        /// </summary>
         [TaskPane("N-Gram Length:", "Specify length of N-Grams", "Analysis Settings", 4, false, ControlType.TextBox)]
         public int NGramLength
         {
@@ -117,6 +124,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the length of M-Grams.
+        /// </summary>
         [TaskPane("M-Gram Length:", "Specify length of M-Grams", "Analysis Settings", 5, false, ControlType.TextBox)]
         public int MGramLength
         {
@@ -134,6 +144,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the characters to skip during the analysis of N-Grams.
+        /// </summary>
         [TaskPane("Character to Skip?", "Specify the characters you want to skip during the analysis of N-Grams", "Analysis Settings", 6, false, ControlType.TextBox)]
         public string CharactersToSkip
         {
@@ -151,6 +164,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the characters to split on during the analysis of N-Grams.
+        /// </summary>
         [TaskPane("Character to Split on:", "Specify the characters you want to split on during the analysis of N-Grams", "Analysis Settings", 7, false, ControlType.TextBox)]
         public string CharactersToSplit
         {
@@ -168,6 +184,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the characters to replace during the analysis of N-Grams.
+        /// </summary>
         [TaskPane("Character to Replace:", "Specify the characters you want to replace during the analysis of N-Grams", "Analysis Settings", 8, false, ControlType.TextBox)]
         public string CharactersToReplace
         {
@@ -185,7 +204,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
-
+        /// <summary>
+        /// Gets or sets the replacement character for characters to replace during the analysis of N-Grams.
+        /// </summary>
         [TaskPane("Replacement Character:", "Specify the characters you want to split on during the analysis of N-Grams", "Analysis Settings", 9, false, ControlType.TextBox)]
         public string ReplacementCharacter
         {
@@ -203,6 +224,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the number of entries to show in the grid.
+        /// </summary>
         [TaskPane("Grid size?", "Specify how many entries are used to build the grid", "Visualization Settings", 1, false, ControlType.TextBox)]
         public int EntriesToShow
         {
@@ -220,6 +244,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the lower boundary for coloring.
+        /// </summary>
         [TaskPane("Coloring Lower Boundary:", "Specify the lower boundary for coloring", "Visualization Settings", 2, false, ControlType.TextBox)]
         public int LowerBoundary
         {
@@ -237,6 +264,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the upper boundary for coloring.
+        /// </summary>
         [TaskPane("Coloring Upper Boundary:", "Specify the upper boundary for coloring", "Visualization Settings", 3, false, ControlType.TextBox)]
         public int UpperBoundary
         {
@@ -253,7 +283,7 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 }
             }
         }
-        
+
         #endregion
 
         #region Events

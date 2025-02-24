@@ -16,9 +16,8 @@
                     <Grid x:Name="NGramFrequencyGrid" ShowGridLines="False" />
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="In-Text Highlighting">
-                <!-- Add your second presentation content here -->
-                <TextBlock Text="This is the second view." HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <TabItem Header="Text View">
+                <RichTextBox x:Name="NGramTextView" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Background="#E0E0E0" />
             </TabItem>
         </TabControl>
     </Grid>

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace CrypTool.Plugins.CommonNMGrammFinder
@@ -19,6 +20,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             DataContext = this;
         }
 
+        /// <summary>
+        /// Gets or sets the lower boundary for the frequency to color conversion.
+        /// </summary>
         public int LowerBoundary
         {
             get => _lowerBoundary;
@@ -33,6 +37,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Gets or sets the upper boundary for the frequency to color conversion.
+        /// </summary>
         public int UpperBoundary
         {
             get => _upperBoundary;
@@ -47,6 +54,9 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             }
         }
 
+        /// <summary>
+        /// Updates the boundaries for the frequency to color converter.
+        /// </summary>
         private void UpdateConverterBoundaries()
         {
             var converter = (FrequencyToColorConverter)Resources["FrequencyToColorConverter"];
@@ -54,7 +64,13 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             converter.UpperBoundary = UpperBoundary;
         }
 
-        public void SetData(Dictionary<string, int> nGramPairDictionary, int entriesToShow)
+        /// <summary>
+        /// Sets the data for the N-Gram frequency grid and updates the RichTextBox with the N-M-Gram combinations in the text.
+        /// </summary>
+        /// <param name="nGramPairDictionary">The dictionary containing N-Gram pairs and their frequencies.</param>
+        /// <param name="entriesToShow">The number of entries to show in the grid.</param>
+        /// <param name="inputText">The input text to display in the RichTextBox.</param>
+        public void SetData(Dictionary<string, int> nGramPairDictionary, int entriesToShow, string inputText)
         {
             _nGramPairDictionary = nGramPairDictionary;
 
@@ -69,11 +85,11 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
             var ngramKeys = sortedPairs.Select(pair => pair.Key.Split(' ')[0]).Distinct().ToList();
             var mgramKeys = sortedPairs.Select(pair => pair.Key.Split(' ')[1]).Distinct().ToList();
 
-            // Create columns for ngramKeys
-            NGramFrequencyGrid.ColumnDefinitions.Add(new ColumnDefinition()); // Empty top-left cell
+            // Create columns for ngramKeys with fixed width
+            NGramFrequencyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) }); // Empty top-left cell
             foreach (var ngram in ngramKeys)
             {
-                NGramFrequencyGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                NGramFrequencyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
             }
 
             // Create rows for mgramKeys
@@ -155,17 +171,58 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                     NGramFrequencyGrid.Children.Add(border);
                 }
             }
+
+            // Update the RichTextBox with the N-M-Gram combinations in the text
+            NGramTextView.Document.Blocks.Clear();
+            var paragraph = new Paragraph();
+            int index = 0;
+            while (index < inputText.Length)
+            {
+                bool matched = false;
+                foreach (var pair in sortedPairs)
+                {
+                    string[] nGramPair = pair.Key.Split(' ');
+                    string nGram = nGramPair[0];
+                    string mGram = nGramPair[1];
+                    if (index + nGram.Length + mGram.Length <= inputText.Length &&
+                        inputText.Substring(index, nGram.Length) == nGram &&
+                        inputText.Substring(index + nGram.Length, mGram.Length) == mGram)
+                    {
+                        var run = new Run(nGram + mGram)
+                        {
+                            Background = (Brush)new FrequencyToColorConverter
+                            {
+                                LowerBoundary = LowerBoundary,
+                                UpperBoundary = UpperBoundary
+                            }.Convert(pair.Value, typeof(Brush), null, null)
+                        };
+                        paragraph.Inlines.Add(run);
+                        index += nGram.Length + mGram.Length;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched)
+                {
+                    paragraph.Inlines.Add(new Run(inputText[index].ToString()));
+                    index++;
+                }
+            }
+            NGramTextView.Document.Blocks.Add(paragraph);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Raises the PropertyChanged event.
+        /// </summary>
+        /// <param name="propertyName">The name of the property that changed.</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
-
 
 
 
