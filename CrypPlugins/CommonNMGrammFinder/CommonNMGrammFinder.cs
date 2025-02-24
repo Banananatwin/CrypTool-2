@@ -79,7 +79,7 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         /// 
         /// </summary>
         [PropertyInfo(Direction.OutputData, "Highlighted Text", "Shows N-gram highlighted in the provided text")]
-        public string HighlightedTextOutput
+        public string SanitizedTextOutput
         {
             get;
             set;
@@ -246,12 +246,24 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         public string GenerateNGramTable(Dictionary<string, int> nGramPairDictionary)
         {
             StringBuilder table = new StringBuilder();
-            table.Append("N-Gram\tM-Gram\tFrequency\n");
+            int nGramColumnWidth = 10;
+            int mGramColumnWidth = 10;
+            int frequencyColumnWidth = 10;
+
+            // Add table header
+            table.AppendLine($"{"N-Gram".PadRight(nGramColumnWidth)}\t{"M-Gram".PadRight(mGramColumnWidth)}\t{"Frequency".PadRight(frequencyColumnWidth)}");
+
+            // Add table rows
             foreach (KeyValuePair<string, int> entry in nGramPairDictionary.OrderByDescending(e => e.Value))
             {
                 string[] nGramPair = entry.Key.Split(' ');
-                table.Append(nGramPair[0] + " |\t" + nGramPair[1] + " |\t" + entry.Value + " |\n");
+                string nGram = nGramPair[0].PadRight(nGramColumnWidth);
+                string mGram = nGramPair[1].PadRight(mGramColumnWidth);
+                string frequency = entry.Value.ToString().PadRight(frequencyColumnWidth);
+
+                table.AppendLine($"{nGram}\t\t{mGram}\t\t{frequency}");
             }
+
             return table.ToString();
         }
 
@@ -267,8 +279,8 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 var sanitizedInputString = SanitizeInputString(InputString);
                 ProgressChanged(1, 3);
 
-                HighlightedTextOutput = sanitizedInputString;
-                OnPropertyChanged("HighlightedTextOutput");
+                SanitizedTextOutput = sanitizedInputString;
+                OnPropertyChanged("SanitizedTextOutput");
                 ProgressChanged(2, 3);
 
 
