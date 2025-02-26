@@ -26,7 +26,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
         #region Private Variables
 
         private bool _skipNGram = false;
-        private bool _ignoreShort = true;
         private string _charactersToSkip = "";
         private string _charactersToReplace = "!?:;,.()[]{}";
         private string _charactersToSplit = "";
@@ -79,27 +78,6 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 {
                     _caseSensitive = value;
                     OnPropertyChanged("CaseSensitive");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to ignore short N-Grams.
-        /// When you use the 'Character to Split on' option, it is possible that N-Grams would be created that are shorter than the specified N- or M-Gram length. If this option is activated, those N-Grams will be discarded.
-        /// </summary>
-        [TaskPane("Ignore short N-Grams?", "When you use the 'Character to Split on' option, it is possible that N-Grams would be created that are too shorter than you specified N- or M-Gram length. If this option is activated, those N-Grams will be discarded", "Analysis Settings", 3, false, ControlType.CheckBox, ValidationType.RangeInteger, 0, 1)]
-        public bool IgnoreShort
-        {
-            get
-            {
-                return _ignoreShort;
-            }
-            set
-            {
-                if (_ignoreShort != value)
-                {
-                    _ignoreShort = value;
-                    OnPropertyChanged("IgnoreShort");
                 }
             }
         }

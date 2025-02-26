@@ -172,9 +172,13 @@ namespace CrypTool.Plugins.CommonNMGrammFinder
                 string nGram = GetNGram(inputString, i, nGramLength, out int nGramEndIndex);
                 string mGram = GetNGram(inputString, i + nGramLength, mGramLength, out int mGramEndIndex);
 
-                if (_settings.IgnoreShort && ((nGram.Length < nGramLength) || (mGram.Length < mGramLength)))
+                if ((nGram.Length < nGramLength) || (mGram.Length < mGramLength))
                 {
                     i = Math.Max(nGramEndIndex, mGramEndIndex) + 1;
+                    if (i >= inputString.Length - nGramLength - mGramLength + 1)
+                    {
+                        break;
+                    }
                     continue;
                 }
 
